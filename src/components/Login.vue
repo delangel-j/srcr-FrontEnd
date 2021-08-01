@@ -33,10 +33,10 @@
 					<StackLayout class="hr-light" />
 				</StackLayout>
 
+                <Button :text="isLoggingIn ? 'Crear cuenta' : 'Regresar' " class="btn btn-primary m-t-20" @tap="toggleForm"/>
 				<Button :text="isLoggingIn ? 'Iniciar sesión' : 'Registrarse'" @tap="submit" class="btn btn-primary m-t-20" />
 				<!--<Label v-show="isLoggingIn" text="¿Olvidaste tu contraseña?" class="login-label" @tap="forgotPassword" />-->
-                <Button :text="isLoggingIn ? 'Crear cuenta' : 'Regresar' " class="btn btn-primary m-t-20" @tap="toggleForm"/>
-
+                
 			</StackLayout>
 
 			
@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import App from './App.vue';
+import Encuesta from './Encuesta.vue';
 // A stub for a service that authenticates users.
 const userService = {
     register(user) {
@@ -67,8 +67,8 @@ export default {
         return {
             isLoggingIn: true,
             user: {
-                name: "Jemsus",
-                email: "foo@foo.com",
+                name: "Jesús",
+                email: "jemsus@comrreo.com",
                 password: "foo",
                 confirmPassword: "foo"
             }
@@ -97,7 +97,7 @@ export default {
             userService
                 .login(this.user)
                 .then(() => {
-                    this.$navigateTo(App);
+                    this.$navigateTo(Encuesta);
                 })
                 .catch(() => {
                     this.alert("No se encuentra la cuenta");
@@ -161,7 +161,7 @@ export default {
 
         alert(message) {
             return alert({
-                title: "CRISVER",
+                title: "SRCR",
                 okButtonText: "OK",
                 message: message
             });
@@ -215,7 +215,7 @@ export default {
 	.btn-primary {
 		height: 50;
 		margin: 30 5 15 5;
-		background-color: black;
+		background-color: #096946;
         color: white;
 		border-radius: 5;
 		font-size: 20;
