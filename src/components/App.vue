@@ -1,7 +1,7 @@
 <template>
     <Page>
         <ActionBar title="" android:flat="true"/>
-        <TabView tabBackgroundColor="#094e0d"
+        <TabView tabBackgroundColor="#096946"
                  android:tabTextColor="#000000"
                  android:selectedTabTextColor="#ffffff"
                  androidSelectedTabHighlightColor="#ffffff"
@@ -10,14 +10,14 @@
 
                  <!-- Primera pantalla (Pantalla de inicio) -->
             <TabViewItem title="Explorar">
-                <FlexboxLayout flexDirection="column" class="fondo">
+                <FlexboxLayout flexDirection="column" class="fondo" style="background-color:#0BB375;">
                     <Label v-show="explorar" textWrap="true" class="message" :text="comrreo" height="30%" width="90%"/>
                     <Button v-show="explorar" class="btn btn-primary" text="¡Sorpréndeme!" @tap="getCategorias"/>
                     <Button v-show="explorar" width="90%" class="btn btn-primary" text="¡Lo haré yo mismo!" @tap="toggleSorprendeme"/>
                     <!-- Termina primera pantalla -->
                     
                     <!-- Pantalla de explorar - sorprendeme -->
-                    <ListView v-show="categorias" for="cat in listaCategorias" height="70%" >
+                    <ListView v-show="categorias" for="cat in listaCategorias" height="70%" style="background-color:#0BB375;">
                             <v-template v-show="restaurantes"  >
                                 <AbsoluteLayout flexDirection="column"   >
                                  <Image :src="cat.url" stretch="fill" class="imagen" :tintColor="bgColor" />
@@ -197,7 +197,7 @@ var geoLocation = require("nativescript-geolocation");
 
         getCategorias(){
             axios
-                .get("http://192.140.25.25:8080/api/srcr/categorias/")
+                .get("http://localhost:8080/api/srcr/categorias/")
                 .then((response )=> {
                     this.listaCategorias = response.data;
                 })
@@ -211,7 +211,7 @@ var geoLocation = require("nativescript-geolocation");
 
         getRestaurantes(latitud, longitud) {
             axios
-                .get('http://192.140.25.25:8080/api/srcr/sucursales', {params: {latitud, longitud}})
+                .get('http://localhost:8080/api/srcr/sucursales', {params: {latitud, longitud}})
                 .then((response )=> {
                     this.listaRestaurantes = response.data;
                 })
@@ -224,7 +224,7 @@ var geoLocation = require("nativescript-geolocation");
         },
         getPlatillos(id_restaurante, correo, index){
             axios
-                .get('http://192.140.25.25:8080/api/srcr/recomendados', {params: {id_restaurante, correo, index}})
+                .get('http://localhost:8080/api/srcr/recomendados', {params: {id_restaurante, correo, index}})
                 .then((response )=> {
                     this.listaPlatillos = response.data;
                 })
@@ -264,7 +264,7 @@ var geoLocation = require("nativescript-geolocation");
 		height: 40;
         width: 90%;
 		margin: 10 5 15 5;
-		background-color: #0BB375;
+		background-color: #096946;
         color: white;
 		border-radius: 5;
 		font-size: 20;
@@ -274,11 +274,12 @@ var geoLocation = require("nativescript-geolocation");
         height: 50;
         width: 50;
         margin: 5 5 15 5;
-        background-color: white;
+        background-color: #096946;
         border: 10;
+        border-radius: 50%;
         font-size: 20;
         font-weight: 600;
-        color:#57a362;
+        color:white;
     }
     .categorias{
         text-align: left;

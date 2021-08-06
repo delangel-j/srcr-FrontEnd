@@ -56,8 +56,9 @@
 					<StackLayout class="hr-light" />
 				</StackLayout>
 
+                
+				<Button :text="isLoggingIn ? 'Iniciar sesión' : 'Registrarse'" @tap="submit(Cliente.correo, Cliente.contrasena)" class="btn btn-primary m-t-20" style="background-color:#096946;color:white;"/>
                 <Button :text="isLoggingIn ? 'Crear cuenta' : 'Regresar' " class="btn btn-primary m-t-20" @tap="toggleForm"/>
-				<Button :text="isLoggingIn ? 'Iniciar sesión' : 'Registrarse'" @tap="submit(Cliente.correo, Cliente.contrasena)" class="btn btn-primary m-t-20" />
 				<!--<Label v-show="isLoggingIn" text="¿Olvidaste tu contraseña?" class="login-label" @tap="forgotPassword" />-->
                 
 			</StackLayout>
@@ -133,10 +134,10 @@ export default {
           
         const token = 
             userService
-                axios.get("http://192.140.25.25:8080/api/srcr/login", {params: {correo, contrasena}})
+                axios.get("http://localhost:8080/api/srcr/login", {params: {correo, contrasena}})
                 .then((response )=> {
                     this.Cliente = response.data;
-                    console.log(correo + " " + response.data.correo);
+                    this.alert("Correo: "+correo + "Contrasena: " + response.data.contrasena)
                     //console.log(this.Cliente.contrasena + " " +this.response.contrasena);
                     if(
                         correo === response.data.correo && 
@@ -151,6 +152,8 @@ export default {
                     console.log(error);
                     this.alert("Datos incorrectos"); 
                 });  
+
+                this.$navigateTo(App);
         },
 
         register() {
@@ -161,7 +164,7 @@ export default {
 
             userService
                 axios
-                    .post("http://192.140.25.25:8080/api/srcr/clientes/agregar", {
+                    .post("http://localhost:8080/api/srcr/clientes/agregar", {
                         nombre: this.Cliente.nombre,
                         correo: this.Cliente.correo,
                         contrasena: this.Cliente.contrasena,
@@ -232,7 +235,7 @@ export default {
 	.page {
 		align-items: center;
 		flex-direction: column;
-        background-color: #2fa13c;
+        background-color: #0BB375;
 	}
 
 	.form {
@@ -273,7 +276,17 @@ export default {
 	.btn-primary {
 		height: 50;
 		margin: 30 5 15 5;
-		background-color: #096946;
+		background-color: white;
+        color: #096946;
+		border-radius: 5;
+		font-size: 20;
+		font-weight: 600;
+	}
+
+    	.btn-inicar {
+		height: 50;
+		margin: 30 5 15 5;
+		background-color:#096946;
         color: white;
 		border-radius: 5;
 		font-size: 20;

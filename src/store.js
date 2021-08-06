@@ -5,7 +5,7 @@ Vue.use(Vuex);
 
 
     const state = {
-        comrreo:'siiiiuuuuu'
+        comrreo:''
     }
 
     const mutations = {
