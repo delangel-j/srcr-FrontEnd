@@ -1,40 +1,63 @@
 <template>
 	<Page actionBarHidden="true">
+        <ScrollView scrollBarIndicatorVisible="true">
 		<FlexboxLayout class="page">
 			<StackLayout class="form">
 				<Image class="logo" src="~/assets/images/logo.png"  v-show="isLoggingIn"/>
 				<Label class="header" text="Bienvenido" v-show="isLoggingIn"/>
+                <Label class="header" text="Registro" v-show="!isLoggingIn"/>
 
                 <StackLayout v-show="!isLoggingIn" class="input-field">
                     <Label text="Nombre" />
-					<TextField ref="name" class="input" hint="Nombre" v-model="user.name" returnKeyType="done"
+					<TextField ref="nombre" class="input" hint="Nombre" v-model="Cliente.nombre" returnKeyType="done"
 					 fontSize="18" />
 					<StackLayout class="hr-light" />
 				</StackLayout>
 
 				<StackLayout class="input-field" marginBottom="25" >
                     <Label text="Correo" /> 
-					<TextField class="input" hint="Correo" keyboardType="email" autocorrect="false" autocapitalizationType="none" v-model="user.email"
+					<TextField class="input" hint="Correo" keyboardType="email" autocorrect="false" autocapitalizationType="none" v-model="Cliente.correo"
 					 returnKeyType="next" @returnPress="focusPassword" fontSize="18" />
 					<StackLayout class="hr-light" />
 				</StackLayout>
 
 				<StackLayout class="input-field" marginBottom="25">
                     <Label text="Contraseña" />
-					<TextField ref="password" class="input" hint="Contraseña" secure="true" v-model="user.password" :returnKeyType="isLoggingIn ? 'done' : 'next'"
+					<TextField ref="contrasena" class="input" hint="Contraseña" secure="true" v-model="Cliente.contrasena" :returnKeyType="isLoggingIn ? 'done' : 'next'"
 					 @returnPress="focusConfirmPassword" fontSize="18" />
 					<StackLayout class="hr-light" />
 				</StackLayout>
 
 				<StackLayout v-show="!isLoggingIn" class="input-field">
                     <Label text="Confirmar contraseña" />
-					<TextField ref="confirmPassword" class="input" hint="Confirmar contraseña" secure="true" v-model="user.confirmPassword" returnKeyType="done"
+					<TextField ref="confirmarContrasena" class="input" hint="Confirmar contraseña" secure="true" v-model="Cliente.confirmarContrasena" returnKeyType="done"
+					 fontSize="18" />
+					<StackLayout class="hr-light" />
+				</StackLayout>
+
+                <StackLayout v-show="!isLoggingIn" class="input-field">
+                    <Label text="¿Cuántas calorias ingieres en el desayuno?" />
+					<TextField ref="desayuno" class="input" hint="Calorias" v-model="Cliente.caloriasDesayuno" returnKeyType="next"
+					 fontSize="18" />
+					<StackLayout class="hr-light" />
+				</StackLayout>
+
+                <StackLayout v-show="!isLoggingIn" class="input-field">
+                    <Label text="¿Cuántas calorias ingieres en la comida?" />
+					<TextField ref="comida" class="input" hint="Calorias" v-model="Cliente.caloriasAlmuerzo" returnKeyType="next"
+					 fontSize="18" />
+					<StackLayout class="hr-light" />
+				</StackLayout>
+
+                <StackLayout v-show="!isLoggingIn" class="input-field">
+                    <Label text="¿Cuántas calorias ingieres en la cena?" />
+					<TextField ref="cena" class="input" hint="Calorias" v-model="Cliente.caloriasCena" returnKeyType="next"
 					 fontSize="18" />
 					<StackLayout class="hr-light" />
 				</StackLayout>
 
                 <Button :text="isLoggingIn ? 'Crear cuenta' : 'Regresar' " class="btn btn-primary m-t-20" @tap="toggleForm"/>
-				<Button :text="isLoggingIn ? 'Iniciar sesión' : 'Registrarse'" @tap="submit" class="btn btn-primary m-t-20" />
+				<Button :text="isLoggingIn ? 'Iniciar sesión' : 'Registrarse'" @tap="submit(Cliente.correo, Cliente.contrasena)" class="btn btn-primary m-t-20" />
 				<!--<Label v-show="isLoggingIn" text="¿Olvidaste tu contraseña?" class="login-label" @tap="forgotPassword" />-->
                 
 			</StackLayout>
@@ -43,21 +66,24 @@
 
 	        
 		</FlexboxLayout>
+        </ScrollView>
 	</Page>
 </template>
 
 <script>
-import Encuesta from './Encuesta.vue';
+import App from './App.vue';
+import axios from 'axios';
+
 // A stub for a service that authenticates users.
 const userService = {
-    register(user) {
-        return Promise.resolve(user);
+    register(Cliente) {
+        return Promise.resolve(Cliente);
     },
-    login(user) {
-        return Promise.resolve(user);
+    login(Cliente) {
+        return Promise.resolve(Cliente);
     },
-    resetPassword(email) {
-        return Promise.resolve(email);
+    resetPassword(contrasena) {
+        return Promise.resolve(contrasena);
     }
 };
 
@@ -66,12 +92,19 @@ export default {
     data() {
         return {
             isLoggingIn: true,
-            user: {
-                name: "Jesús",
-                email: "jemsus@comrreo.com",
-                password: "foo",
-                confirmPassword: "foo"
-            }
+            Cliente: {
+                nombre: "",
+                correo: "",
+                contrasena: "",
+                confirmarContrasena: "",
+                caloriasDesayuno: "",
+                caloriasAlmuerzo: "",
+                caloriasCena: ""
+            },
+            auth: {
+                        correo: "",
+                        contrasena: ""
+                        }
         };
     },
     methods: {
@@ -79,47 +112,76 @@ export default {
             this.isLoggingIn = !this.isLoggingIn;
         },
 
-        submit() {
-            if (!this.user.email || !this.user.password) {
+        submit(correo, contrasena) {
+            if (!this.Cliente.contrasena || !this.Cliente.contrasena) {
                 this.alert(
                     "Ingresa tu correo y contraseña"
                 );
                 return;
             }
             if (this.isLoggingIn) {
-                this.login();
+                this.login(correo, contrasena);
             } else {
                 this.register();
             }
         },
 
-        login() {
+        
+        login(correo, contrasena) {
+
+          
+        const token = 
             userService
-                .login(this.user)
-                .then(() => {
-                    this.$navigateTo(Encuesta);
+                axios.get("http://192.140.25.25:8080/api/srcr/login", {params: {correo, contrasena}})
+                .then((response )=> {
+                    this.Cliente = response.data;
+                    console.log(correo + " " + response.data.correo);
+                    //console.log(this.Cliente.contrasena + " " +this.response.contrasena);
+                    if(
+                        correo === response.data.correo && 
+                        contrasena === response.data.contrasena){
+                            this.$navigateTo(App, {
+                                context: {
+                                    propsData: {
+                                        caloriasDesayuno: 'asdasdasd'
+                                    }
+                                }
+                            })
+                    }else{
+                        this.alert("Error al iniciar sesión")
+                    }
                 })
-                .catch(() => {
-                    this.alert("No se encuentra la cuenta");
-                });
+                .catch(( error) => {
+                    console.log(error);
+                    this.alert("Datos incorrectos"); 
+                });  
         },
 
         register() {
-            if (this.user.password != this.user.confirmPassword) {
+            if (this.Cliente.contrasena != this.Cliente.confirmarContrasena) {
                 this.alert("Las contraseñas no coinciden.");
                 return;
             }
 
             userService
-                .register(this.user)
+                axios
+                    .post("http://192.140.25.25:8080/api/srcr/clientes/agregar", {
+                        nombre: this.Cliente.nombre,
+                        correo: this.Cliente.correo,
+                        contrasena: this.Cliente.contrasena,
+                        caloriasDesayuno: this.Cliente.caloriasDesayuno,
+                        caloriasAlmuerzo: this.Cliente.caloriasAlmuerzo,
+                        caloriasCena: this.Cliente.ca,loriasCena
+                    })
                 .then(() => {
                     this.alert("Tu cuenta ha sido creada.");
                     this.isLoggingIn = true;
                 })
-                .catch(() => {
+                .catch((error) => {
                     this.alert(
                         "Error al crear la cuenta"
                     );
+                    console.log(error);
                 });
         },
 
@@ -151,11 +213,11 @@ export default {
         },
 
         focusPassword() {
-            this.$refs.password.nativeView.focus();
+            this.$refs.contrasena.nativeView.focus();
         },
         focusConfirmPassword() {
             if (!this.isLoggingIn) {
-                this.$refs.confirmPassword.nativeView.focus();
+                this.$refs.confirmarContrasena.nativeView.focus();
             }
         },
 

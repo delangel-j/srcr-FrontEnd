@@ -3,6 +3,12 @@
 		<FlexboxLayout class="page">
 			<StackLayout class="form">
 				
+
+				<!-- YA NO SE USAAAAAAAAAAAAAAAAAAAAAAAA
+				   
+				    GAAAAAAAAAAAAAAAAAIOOOOOOOOOOOOOO-->
+
+
 				<Label class="header" text="Bienvenido" v-show="bienvenido"/>
                 <Label class="header" text="Antes de buscar tus platillos favoritos necesitamos saber más sobre ti y tus gustos" v-show="bienvenido" textWrap="true"/>
                 <Image class="logo" src="~/assets/images/logo.png"  v-show="bienvenido"/>

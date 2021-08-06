@@ -5,60 +5,78 @@
                  android:tabTextColor="#000000"
                  android:selectedTabTextColor="#ffffff"
                  androidSelectedTabHighlightColor="#ffffff"
+                 androidTabsPosition="bottom"
                  >
+
+                 <!-- Primera pantalla (Pantalla de inicio) -->
             <TabViewItem title="Explorar">
                 <FlexboxLayout flexDirection="column" class="fondo">
                     <Label v-show="explorar" textWrap="true" class="message" text="¿Cómo desea encontrar sus platillos?" height="30%" width="90%"/>
-                    <Button v-show="explorar" class="btn btn-primary" text="¡Sorpréndeme!" @tap="toggleCategorias"/>
+                    <Button v-show="explorar" class="btn btn-primary" text="¡Sorpréndeme!" @tap="getCategorias"/>
                     <Button v-show="explorar" width="90%" class="btn btn-primary" text="¡Lo haré yo mismo!" @tap="toggleSorprendeme"/>
+                    <!-- Termina primera pantalla -->
                     
-                    
-                    <ListView v-show="categorias" for="cat in listaCategorias" height="60%" >
+                    <!-- Pantalla de explorar - sorprendeme -->
+                    <ListView v-show="categorias" for="cat in listaCategorias" height="70%" >
                             <v-template v-show="restaurantes"  >
                                 <AbsoluteLayout flexDirection="column"   >
-                                 <Image :src="cat.imagen" stretch="fill" class="imagen" :tintColor="bgColor" />
+                                 <Image :src="cat.url" stretch="fill" class="imagen" :tintColor="bgColor" />
                                 <Label :text="cat.nombre" class="card"  />
-                               
-                               
                                 </AbsoluteLayout>
-                            
-                            </v-template>
-                         
-                            
+                            </v-template>   
                         </ListView>
                         <Button v-show="categorias" width="30" class="btn-circle" text="->" @tap="togglePreferencias"/>
-                        <Button v-show="categorias" class="btn-circle" text="Regresar" @tap="toggleCategorias"/>
-                    
+                        <Button v-show="categorias" class="btn-circle" text="Regresar" @tap="getCategorias"/>
+                    <!-- Termina pantalla de explorar - sorprendeme -->
 
-                    <Label v-show="preferencias" textWrap="true" height="20%" width="80%" class="message" text="Desea continuar con tus preferencias ya registradas?" alignSelf="center"/>
+                    <!-- Pantalla explorar confirmación - sorprendeme -->
+                    <Label v-show="preferencias" textWrap="true" height="20%" width="80%" class="message" text="¿Desea continuar con tus preferencias ya registradas?" alignSelf="center"/>
                     <Button v-show="preferencias" class="btn btn-primary" text="Sí, continuar" @tap="toggleBusqueda"/>
                     <Button v-show="preferencias" width="90%" class="btn btn-primary" text="No, cambiar las calorías"/>
+                    <!-- Termina pantalla explorar confirmación - sorprendeme -->
 
+                    <!-- Pantalla explorar búsqueda -- sorprendeme -->
                     <Label v-show="busqueda" height="30%" class="message" text="Buscando platillos..."/>
                     <Label v-show="busqueda" :text="'Latitude: ' + currentGeoLocation.latitude" />
                     <Label v-show="busqueda" :text="'Longitude: ' + currentGeoLocation.longitude" />
-                    <AbsoluteLayout v-show="busqueda" class="" @tap="getRestaurantes">
+                    <AbsoluteLayout v-show="busqueda" class="" @tap="getRestaurantes(currentGeoLocation.latitude, currentGeoLocation.longitude)">
                        <!-- <Label class="cv-lbl"/>
                         <Label class="inner-circle"/>-->
                         <ActivityIndicator color="#096946" :busy="isBusy" width="150" height="150"/>
-                        
                     </AbsoluteLayout>
                     <Label v-show="busqueda" class="message" text="Buscando restaurantes"/>
+                    <!-- Termina pantalla de explorar búsqueda - sorprendeme -->
 
-                    
+                        <!--Pantalla explorar restaurantes - sorprendeme -->
                         <Label v-show="restaurantes" class="message" text="Restaurantes" />
                         <ListView v-show="restaurantes" for="rest in listaRestaurantes" height="85%">
                             <v-template v-show="restaurantes">
-                                <AbsoluteLayout flexDirection="column">
-                                <Image :src="rest.imgUrl" stretch="fill" class="imagen"/>
-                                <Label :text="rest.nombre" class="card"/>
+                                <AbsoluteLayout flexDirection="column" @tap="getPlatillos(rest.restaurante.idRestaurante)">
+                                <Image :src="rest.restaurante.imgUrl" stretch="fill" class="imagen"/>
+                                <Label :text="rest.restaurante.nombre" class="card"/>
                                 </AbsoluteLayout>
                             </v-template>
                         </ListView>
+                    <!--termina Pantalla explorar restaurantes - sorprendeme -->
+
+                    <!-- Pantalla de lista de platillos por restaurante-->
+                        <ListView v-show="platillosCargados" for="platillos in listaPlatillos" height="85%">
+                            <v-template v-show="platillosCargados">
+                                <GridLayout columns="auto,auto,auto" rows="auto,15, auto">
+                                <Label textWrap="true" column="0" row="0" :text="platillos.nombre" class="platillos"/>
+                                <Label textWrap="true" column="0" row="2" :text="'Calorias: ' + platillos.calorias" class="platillos"/>
+                               <!-- <Label textWrap="true" column="1" row="2"  :text="'Gramos por porción' + platillos.gramosPorPorcion" class="platillos"/>-->
+                                <Label textWrap="true" column="1" row="2" :text="'Precio: ' + platillos.precio +'$'" class="platillos"/>
+                                </GridLayout>
+                            </v-template>
+                        </ListView>
+                        <!-- Termina pantalla de lista de platillos por restaurante -->
+
+
                 </FlexboxLayout>
 
 
-                
+                <!-- Estan son las demás pestañas de la interfaz -->
             </TabViewItem>
             <TabViewItem title="Favoritos">
                 <GridLayout columns="*" rows="*">
@@ -80,40 +98,30 @@
 </template>
 
 <script >
-//import axios from 'axios';
+import axios from 'axios';
 var geoLocation = require("nativescript-geolocation");
   export default {
     data() {
       return {
+
+          //Variables utilizadas para mostrar elementos on v-show
           explorar: true,
           categorias: false,
           preferencias: false,
           busqueda: false,
           restaurantes: false,
           datosCargados: false,
+          platillosCargados: false,
           isBusy: true,
           bgColor: "",
           isActive: true,
 
+          //Listas utilizadas para guardar las consultas
           listaRestaurantes: [],
-          listaCategorias: [
-              {
-                  nombre: "Postres",
-                  imagen: "~/assets/images/postres.jpg"
-              },
-              {
-                  nombre: "Carnes",
-                  imagen: "~/assets/images/carnes.jpg"
-              },
-              {
-                  nombre: "Ensaladas",
-                  imagen: "~/assets/images/ensaladas.jpg"
-              },
-              {
-                  nombre: "Bebidas",
-                  imagen: "~/assets/images/bebidas.jpg"
-              },
-          ],
+          listaCategorias: [],
+          listaPlatillos: [],
+
+        //Datos de la ubicación
         currentGeoLocation: {
             latitude: null,
             longitude: null,
@@ -123,10 +131,8 @@ var geoLocation = require("nativescript-geolocation");
       }
     },
     methods: {
-        toggleCategorias(){
-            this.explorar = !this.explorar;
-            this.categorias = !this.categorias;
-        },
+
+        //Métodos para mostrar/ocultar elementos con v-show
         togglePreferencias(){
             this.categorias = !this.categorias;
             this.preferencias = !this.preferencias;
@@ -142,9 +148,7 @@ var geoLocation = require("nativescript-geolocation");
             this.preferencias = !this.preferencias;
             this.busqueda = !this.busqueda;
         },
-        toggleResultados(){
-            
-        },
+ 
         toggleSorprendeme: function() {
             geoLocation.isEnabled().then(enabled => {
                 if(!enabled){
@@ -181,12 +185,22 @@ var geoLocation = require("nativescript-geolocation");
         //////////Peticiones a la BD
 
         getCategorias(){
+            axios
+                .get("http://192.140.25.25:8080/api/srcr/categorias/")
+                .then((response )=> {
+                    this.listaCategorias = response.data;
+                })
+                .catch(( error) => {
+                    console.log(error); 
+                });  
+                this.explorar = !this.explorar;
+                this.categorias = !this.categorias;
 
         },
 
-        getRestaurantes() {
-            this.$axios
-                .get("restaurantes/")
+        getRestaurantes(latitud, longitud) {
+            axios
+                .get('http://192.140.25.25:8080/api/srcr/sucursales', {params: {latitud, longitud}})
                 .then((response )=> {
                     this.listaRestaurantes = response.data;
                 })
@@ -196,6 +210,18 @@ var geoLocation = require("nativescript-geolocation");
             this.busqueda = !this.busqueda;
             this.restaurantes = !this.restaurantes;
             
+        },
+        getPlatillos(id_restaurante){
+            axios
+                .get('http://192.140.25.25:8080/api/srcr/platillos', {params: {id_restaurante}})
+                .then((response )=> {
+                    this.listaPlatillos = response.data;
+                })
+                .catch(( error) => {
+                    console.log(error);
+                })
+            this.platillosCargados = !this.platillosCargados;
+            this.restaurantes = !this.restaurantes;
         }
         
 
@@ -285,6 +311,10 @@ var geoLocation = require("nativescript-geolocation");
         padding-left: 15%;
         bottom: 100%;
     } 
+    .platillos{
+        font-size: 20;
+
+    }
     .imagen{
         height: 100;
         width: 90%;
