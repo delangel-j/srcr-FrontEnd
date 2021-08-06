@@ -11,7 +11,7 @@
                  <!-- Primera pantalla (Pantalla de inicio) -->
             <TabViewItem title="Explorar">
                 <FlexboxLayout flexDirection="column" class="fondo">
-                    <Label v-show="explorar" textWrap="true" class="message" text="¿Cómo desea encontrar sus platillos?" height="30%" width="90%"/>
+                    <Label v-show="explorar" textWrap="true" class="message" :text="comrreo" height="30%" width="90%"/>
                     <Button v-show="explorar" class="btn btn-primary" text="¡Sorpréndeme!" @tap="getCategorias"/>
                     <Button v-show="explorar" width="90%" class="btn btn-primary" text="¡Lo haré yo mismo!" @tap="toggleSorprendeme"/>
                     <!-- Termina primera pantalla -->
@@ -51,7 +51,7 @@
                         <Label v-show="restaurantes" class="message" text="Restaurantes" />
                         <ListView v-show="restaurantes" for="rest in listaRestaurantes" height="85%">
                             <v-template v-show="restaurantes">
-                                <AbsoluteLayout flexDirection="column" @tap="getPlatillos(rest.restaurante.idRestaurante)">
+                                <AbsoluteLayout flexDirection="column" @tap="getPlatillos(rest.restaurante.idRestaurante, 'jesus@correo.com', 2)">
                                 <Image :src="rest.restaurante.imgUrl" stretch="fill" class="imagen"/>
                                 <Label :text="rest.restaurante.nombre" class="card"/>
                                 </AbsoluteLayout>
@@ -101,6 +101,7 @@
 import axios from 'axios';
 var geoLocation = require("nativescript-geolocation");
   export default {
+      
     data() {
       return {
 
@@ -115,6 +116,10 @@ var geoLocation = require("nativescript-geolocation");
           isBusy: true,
           bgColor: "",
           isActive: true,
+          correo: 'jesus@correo.com',
+          index: 2,
+          caloriasDesayuno: "",
+
 
           //Listas utilizadas para guardar las consultas
           listaRestaurantes: [],
@@ -130,6 +135,12 @@ var geoLocation = require("nativescript-geolocation");
         }
       }
     },
+    computed: {
+        comrreo(){
+            return this.$store.state.comrreo
+        }
+    },
+  
     methods: {
 
         //Métodos para mostrar/ocultar elementos con v-show
@@ -211,9 +222,9 @@ var geoLocation = require("nativescript-geolocation");
             this.restaurantes = !this.restaurantes;
             
         },
-        getPlatillos(id_restaurante){
+        getPlatillos(id_restaurante, correo, index){
             axios
-                .get('http://192.140.25.25:8080/api/srcr/platillos', {params: {id_restaurante}})
+                .get('http://192.140.25.25:8080/api/srcr/recomendados', {params: {id_restaurante, correo, index}})
                 .then((response )=> {
                     this.listaPlatillos = response.data;
                 })

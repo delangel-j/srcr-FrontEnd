@@ -107,6 +107,7 @@ export default {
                         }
         };
     },
+    
     methods: {
         toggleForm() {
             this.isLoggingIn = !this.isLoggingIn;
@@ -140,13 +141,8 @@ export default {
                     if(
                         correo === response.data.correo && 
                         contrasena === response.data.contrasena){
-                            this.$navigateTo(App, {
-                                context: {
-                                    propsData: {
-                                        caloriasDesayuno: 'asdasdasd'
-                                    }
-                                }
-                            })
+                            //this.$store.commit();
+                            this.$navigateTo(App)
                     }else{
                         this.alert("Error al iniciar sesión")
                     }
