@@ -9,6 +9,9 @@ Vue.use(Vuex);
     }
 
     const mutations = {
+        guardar(state, data){
+            state.comrreo = data;
+        }
 
     }
 

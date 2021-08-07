@@ -134,15 +134,15 @@ export default {
           
         const token = 
             userService
-                axios.get("http://localhost:8080/api/srcr/login", {params: {correo, contrasena}})
+                axios.get("http://192.140.25.25:8080/api/srcr/login", {params: {correo, contrasena}})
                 .then((response )=> {
                     this.Cliente = response.data;
-                    this.alert("Correo: "+correo + "Contrasena: " + response.data.contrasena)
+                    
                     //console.log(this.Cliente.contrasena + " " +this.response.contrasena);
                     if(
                         correo === response.data.correo && 
                         contrasena === response.data.contrasena){
-                            //this.$store.commit();
+                            this.$store.commit("guardar", correo);
                             this.$navigateTo(App)
                     }else{
                         this.alert("Error al iniciar sesión")
@@ -153,7 +153,6 @@ export default {
                     this.alert("Datos incorrectos"); 
                 });  
 
-                this.$navigateTo(App);
         },
 
         register() {
@@ -164,7 +163,7 @@ export default {
 
             userService
                 axios
-                    .post("http://localhost:8080/api/srcr/clientes/agregar", {
+                    .post("http://192.140.25.25:8080/api/srcr/clientes/agregar", {
                         nombre: this.Cliente.nombre,
                         correo: this.Cliente.correo,
                         contrasena: this.Cliente.contrasena,

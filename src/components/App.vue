@@ -11,7 +11,7 @@
                  <!-- Primera pantalla (Pantalla de inicio) -->
             <TabViewItem title="Explorar">
                 <FlexboxLayout flexDirection="column" class="fondo" style="background-color:#0BB375;">
-                    <Label v-show="explorar" textWrap="true" class="message" :text="comrreo" height="30%" width="90%"/>
+                    <Label v-show="explorar" textWrap="true" class="message" :text="correo" height="30%" width="90%"/>
                     <Button v-show="explorar" class="btn btn-primary" text="¡Sorpréndeme!" @tap="getCategorias"/>
                     <Button v-show="explorar" width="90%" class="btn btn-primary" text="¡Lo haré yo mismo!" @tap="toggleSorprendeme"/>
                     <!-- Termina primera pantalla -->
@@ -51,7 +51,7 @@
                         <Label v-show="restaurantes" class="message" text="Restaurantes" />
                         <ListView v-show="restaurantes" for="rest in listaRestaurantes" height="85%">
                             <v-template v-show="restaurantes">
-                                <AbsoluteLayout flexDirection="column" @tap="getPlatillos(rest.restaurante.idRestaurante, 'jesus@correo.com', 2)">
+                                <AbsoluteLayout flexDirection="column" @tap="getPlatillos(rest.restaurante.idRestaurante, correo, 2)">
                                 <Image :src="rest.restaurante.imgUrl" stretch="fill" class="imagen"/>
                                 <Label :text="rest.restaurante.nombre" class="card"/>
                                 </AbsoluteLayout>
@@ -78,11 +78,7 @@
 
                 <!-- Estan son las demás pestañas de la interfaz -->
             </TabViewItem>
-            <TabViewItem title="Favoritos">
-                <GridLayout columns="*" rows="*">
-                    <Label class="message" text="Tab 2 Content" col="0" row="0"/>
-                </GridLayout>
-            </TabViewItem>
+            
             <TabViewItem title="Preferencias">
                 <GridLayout columns="*" rows="*">
                     <Label class="message" text="Tab 3 Content" col="0" row="0"/>
@@ -116,8 +112,8 @@ var geoLocation = require("nativescript-geolocation");
           isBusy: true,
           bgColor: "",
           isActive: true,
-          correo: 'jesus@correo.com',
-          index: 2,
+          correo: '',
+          index: 1,
           caloriasDesayuno: "",
 
 
@@ -136,12 +132,18 @@ var geoLocation = require("nativescript-geolocation");
       }
     },
     computed: {
-        comrreo(){
-            return this.$store.state.comrreo
-        }
+        
+    },
+    created() {
+        this.getComrreo();
     },
   
     methods: {
+
+        getComrreo(){
+            this.correo = this.$store.state.comrreo;
+            //return this.$store.state.comrreo
+        },
 
         //Métodos para mostrar/ocultar elementos con v-show
         togglePreferencias(){
@@ -197,7 +199,7 @@ var geoLocation = require("nativescript-geolocation");
 
         getCategorias(){
             axios
-                .get("http://localhost:8080/api/srcr/categorias/")
+                .get("http://192.140.25.25:8080/api/srcr/categorias/")
                 .then((response )=> {
                     this.listaCategorias = response.data;
                 })
@@ -211,7 +213,7 @@ var geoLocation = require("nativescript-geolocation");
 
         getRestaurantes(latitud, longitud) {
             axios
-                .get('http://localhost:8080/api/srcr/sucursales', {params: {latitud, longitud}})
+                .get('http://192.140.25.25:8080/api/srcr/sucursales', {params: {latitud, longitud}})
                 .then((response )=> {
                     this.listaRestaurantes = response.data;
                 })
@@ -224,7 +226,7 @@ var geoLocation = require("nativescript-geolocation");
         },
         getPlatillos(id_restaurante, correo, index){
             axios
-                .get('http://localhost:8080/api/srcr/recomendados', {params: {id_restaurante, correo, index}})
+                .get('http://192.140.25.25:8080/api/srcr/recomendados', {params: {id_restaurante, correo, index}})
                 .then((response )=> {
                     this.listaPlatillos = response.data;
                 })
